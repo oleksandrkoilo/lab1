@@ -24,3 +24,6 @@ public sealed record IncidentCommentResponse(
     string AuthorDisplayName,
     string Text,
     DateTimeOffset CreatedAtUtc);
+
+// Елемент підсумку інцидентів за рівнем критичності (ЛР 1).
+public sealed record IncidentSeveritySummaryResponse(string Severity, int Count);

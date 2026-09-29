@@ -1,45 +1,61 @@
-# Карта архітектури
+# Карта архітектури (після ЛР 1)
 
-Це початкова карта. Під час ЛР 1 доповніть її власним трасуванням запиту,
-конкретними файлами та спостереженнями з DevTools і журналу PostgreSQL.
+## Компоненти системи
 
-## Компоненти
-
-| Компонент | Розташування | Відповідальність |
+| Компонент | Де знаходиться | Що робить |
 |---|---|---|
-| Browser client | `src/SecureLab.Api/Client/` | Надсилає HTTP-запити, безпечно показує відповідь через DOM API |
-| Presentation | `Presentation/` | Описує endpoints, читає зовнішні параметри, формує HTTP-відповідь |
-| Application | `Application/` | Виконує сценарій отримання списку або деталей інциденту |
-| Data | `Data/` | Відображає C#-сутності на PostgreSQL через EF Core/Npgsql |
-| PostgreSQL | `infra/compose.yaml` | Зберігає навчальні дані у локальному контейнері |
+| Браузерний клієнт | `src/SecureLab.Api/Client/` | HTML + Vanilla JS: надсилає `fetch`-запити й виводить результат через DOM API (`textContent`) |
+| API (Presentation) | `Presentation/Endpoints/IncidentEndpoints.cs`, `Presentation/Contracts/IncidentResponses.cs` | Маршрути `/api/incidents/...`, перевірка вхідних параметрів, HTTP-відповіді та DTO |
+| Application | `Application/Incidents/IncidentQueries.cs` | Запити читання: список, деталі, підсумок за severity |
+| Data (EF Core + Npgsql) | `Data/SecureLabDbContext.cs`, `Data/Migrations`, `Data/DbSeeder.cs` | Зв'язок entity з таблицями, migration, seed і reset |
+| PostgreSQL | `infra/compose.yaml` | Локальна БД у Docker, порт `127.0.0.1:54329` |
 
-## Підготовлений наскрізний маршрут
+## Новий маршрут: підсумок за severity
 
 ```text
-submit/click у Client/app.js
-  → GET /api/incidents або GET /api/incidents/{id}
-  → Presentation/Endpoints/IncidentEndpoints.cs
-  → Application/Incidents/IncidentQueries.cs
-  → Data/SecureLabDbContext.cs
-  → PostgreSQL
-  → response DTO у Presentation/Contracts/
-  → JSON
-  → textContent/createTextNode у Client/app.js
+кнопка #severity-button (Client/index.html)
+  → showSeveritySummary (Client/app.js)
+  → GET /api/incidents/severity-summary
+  → IncidentEndpoints.GetSummaryBySeverityAsync
+  → IncidentQueries.GetSummaryBySeverityAsync
+  → SecureLabDbContext.Incidents / таблиця incidents (GROUP BY severity)
+  → List<IncidentSeveritySummaryResponse> → JSON
+  → рядки таблиці #severity-rows через textContent
+```
+
+Рішення щодо контракту:
+
+- відповідь — масив `{ severity, count }`, інших полів немає;
+- політика нульових груп — **лише наявні групи**: рівень без інцидентів не повертається, порожня таблиця дає `[]`;
+- порядок — **count за спаданням**, при рівному count першим іде вищий рівень критичності (сортування після матеріалізації, бо `severity` у БД — текст);
+- на seed: `High 1, Medium 1, Low 1` (Critical відсутній).
+
+## Досліджений маршрут деталей
+
+```text
+клік по картці → loadIncidentDetails (app.js) → GET /api/incidents/{id}
+  → IncidentEndpoints.GetDetailsAsync (/{id:guid}, null → 404)
+  → IncidentQueries.GetDetailsAsync (AsNoTracking, Where, Select, SingleOrDefaultAsync)
+  → SecureLabDbContext.Incidents → incidents
+  → IncidentDetailsResponse → JSON → renderIncidentDetails (textContent, createTextNode)
 ```
 
 ## Межі довіри
 
-Доповніть таблицю щонайменше трьома конкретними спостереженнями.
+| Межа | Дані | Чого не можна припускати | Контроль |
+|---|---|---|---|
+| Браузер → API | URL, path `id`, query `status`, заголовки | що запит прийшов саме з нашої форми | `:guid`, перевірка enum (400), обробка `null` (404) |
+| API → PostgreSQL | параметри умов запиту | що значення безпечні для SQL | параметризовані запити EF Core, `AsNoTracking()` |
+| API → браузер | JSON-відповідь | що клієнту можна віддати всі поля entity | окремі DTO; summary містить лише `severity` і `count` |
+| Відповідь → DOM | текстові поля | що текст із БД не містить HTML | `textContent`, `createTextNode`; тест забороняє `innerHTML` |
 
-| Межа | Чому даним ще не можна довіряти | Де перевіряємо або обмежуємо |
-|---|---|---|
-| Користувач → Browser client | Користувач контролює введення | TODO |
-| Browser client → API | Клієнт і HTTP-запит можна змінити поза UI | TODO |
-| PostgreSQL → API → DOM | У БД може зберігатися раніше введений недовірений текст | DTO та безпечний DOM sink; доповнити |
+## Конфігурація
 
-## Конфігураційні входи
+- `global.json` — .NET SDK смуги 10.0.3xx;
+- `appsettings.json`, `appsettings.Development.json` — налаштування та локальний connection string навчального стенда;
+- `infra/compose.yaml` + `infra/.env.example` — контейнер PostgreSQL і порт;
+- `ConnectionStrings__SecureLab` — змінна середовища для перевизначення рядка підключення поза Git.
 
-- `global.json` — версія .NET SDK;
-- `src/SecureLab.Api/appsettings*.json` — режим міграцій і локальний connection string;
-- `infra/compose.yaml` — версія PostgreSQL, порт і локальні навчальні облікові дані;
-- змінна середовища `ConnectionStrings__SecureLab` — безпечний спосіб перевизначити connection string поза репозиторієм.
+## Повернення до початкового стану
+
+`dotnet run --project src/SecureLab.Api -- --reset-database` — очищує навчальні таблиці та заново заповнює seed (лише Development).

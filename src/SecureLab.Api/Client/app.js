@@ -2,6 +2,10 @@ const listElement = document.querySelector("#incident-list");
 const listStatusElement = document.querySelector("#list-status");
 const detailsElement = document.querySelector("#incident-details");
 const filterForm = document.querySelector("#filter-form");
+const severityButton = document.querySelector("#severity-button");
+const severityStatus = document.querySelector("#severity-status");
+const severityTable = document.querySelector("#severity-table");
+const severityRows = document.querySelector("#severity-rows");
 
 async function apiFetch(path, options = {}) {
   const response = await fetch(path, {
@@ -102,6 +106,43 @@ async function loadIncidentDetails(id) {
     detailsElement.textContent = `Помилка: ${error.message}`;
   }
 }
+
+// ЛР 1: таблиця кількості інцидентів за severity.
+// Значення з API потрапляють у DOM тільки як текст (textContent).
+async function showSeveritySummary() {
+  severityStatus.textContent = "Завантаження…";
+  severityRows.replaceChildren();
+  severityTable.hidden = true;
+
+  let summary;
+  try {
+    summary = await apiFetch("/api/incidents/severity-summary");
+  } catch {
+    // Без деталей помилки: лише зрозуміле повідомлення для користувача.
+    severityStatus.textContent = "Помилка завантаження підсумку.";
+    return;
+  }
+
+  // Порожня таблиця incidents -> API повертає [] (політика "лише наявні групи").
+  if (summary.length === 0) {
+    severityStatus.textContent = "Даних немає";
+    return;
+  }
+
+  for (const entry of summary) {
+    const row = document.createElement("tr");
+    row.append(
+      createTextElement("td", entry.severity),
+      createTextElement("td", String(entry.count)),
+    );
+    severityRows.append(row);
+  }
+
+  severityTable.hidden = false;
+  severityStatus.textContent = `Груп: ${summary.length}`;
+}
+
+severityButton.addEventListener("click", showSeveritySummary);
 
 filterForm.addEventListener("submit", (event) => {
   event.preventDefault();

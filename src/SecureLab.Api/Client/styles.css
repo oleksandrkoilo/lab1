@@ -138,3 +138,25 @@ select {
     grid-template-columns: 1fr;
   }
 }
+
+.severity-panel {
+  grid-column: 1 / -1;
+}
+
+.severity-table {
+  width: min(420px, 100%);
+  margin-top: 1rem;
+  border-collapse: collapse;
+}
+
+.severity-table th,
+.severity-table td {
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid #dce3ed;
+  text-align: left;
+}
+
+.severity-table td:last-child,
+.severity-table th:last-child {
+  text-align: right;
+}

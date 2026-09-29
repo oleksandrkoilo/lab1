@@ -46,6 +46,21 @@
         Виберіть інцидент зі списку.
       </div>
     </section>
+    <section class="panel severity-panel" aria-labelledby="severity-title">
+      <div class="toolbar">
+        <div>
+          <h2 id="severity-title">Інциденти за severity</h2>
+          <p id="severity-status" role="status">Підсумок ще не завантажено.</p>
+        </div>
+        <button id="severity-button" type="button">Показати підсумок</button>
+      </div>
+      <table id="severity-table" class="severity-table" hidden>
+        <thead>
+          <tr><th scope="col">Severity</th><th scope="col">Кількість</th></tr>
+        </thead>
+        <tbody id="severity-rows"></tbody>
+      </table>
+    </section>
   </main>
 </body>
 </html>
