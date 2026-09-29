@@ -25,6 +25,14 @@ Accept: application/json
 GET {{host}}/api/incidents?status=Unknown
 Accept: application/json
 
-### Lab 1 extension point: expected 501 before student implementation
+### Empty list flow: expected 200 and [] on restored seed
+GET {{host}}/api/incidents?status=Resolved
+Accept: application/json
+
+### Lab 1 severity summary: expected 200 (was 501 in baseline)
+# Response: [{ "severity": "...", "count": N }], only severity + count.
+# Policy: only existing groups (no Critical on seed, empty table -> []).
+# Order: count desc, then higher severity first.
+# Restored seed: High 1, Medium 1, Low 1.
 GET {{host}}/api/incidents/severity-summary
 Accept: application/json

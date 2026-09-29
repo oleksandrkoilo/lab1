@@ -58,4 +58,27 @@ public sealed class IncidentQueries(SecureLabDbContext dbContext, ILogger<Incide
                     .ToList()))
             .SingleOrDefaultAsync(cancellationToken);
     }
+
+    // ЛР 1. Кількість інцидентів за severity.
+    // Політика: лише наявні групи (рівень без інцидентів у відповідь не потрапляє,
+    // порожня таблиця -> порожній масив).
+    // Порядок: count за спаданням, при однаковому count - вищий рівень критичності першим.
+    // Сортування виконується після матеріалізації, бо в БД severity зберігається як текст.
+    public async Task<IReadOnlyList<IncidentSeveritySummaryResponse>> GetSummaryBySeverityAsync(
+        CancellationToken cancellationToken)
+    {
+        var rows = await dbContext.Incidents
+            .AsNoTracking()
+            .GroupBy(incident => incident.Severity)
+            .Select(group => new { Severity = group.Key, Total = group.Count() })
+            .ToListAsync(cancellationToken);
+
+        logger.LogInformation("Severity summary: {GroupCount} non-empty groups", rows.Count);
+
+        return rows
+            .OrderByDescending(row => row.Total)
+            .ThenByDescending(row => row.Severity)
+            .Select(row => new IncidentSeveritySummaryResponse(row.Severity.ToString(), row.Total))
+            .ToList();
+    }
 }
