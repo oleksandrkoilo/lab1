@@ -11,19 +11,26 @@ public static class Lab02Endpoints
     {
         app.MapGet("/api/incidents/search", async (string? q, string? sortBy, SecureLabDbContext db, CancellationToken ct) =>
         {
-            var order = sortBy switch
+            // ЛР 02 (виправлення): жодного SQL-тексту з q — лише LINQ, значення йде параметром
+            var likePattern = $"%{EscapeLikePattern(q ?? string.Empty)}%";
+            var matches = db.Incidents
+                .AsNoTracking()
+                .Where(item => EF.Functions.ILike(item.Title, likePattern, @"\")
+                            || EF.Functions.ILike(item.Description, likePattern, @"\"));
+
+            var ordered = ApplySearchOrder(matches, sortBy);
+            if (ordered is null)
             {
-                null or "" or "createdAtUtc" => "created_at_utc DESC",
-                "severity" => "severity", "status" => "status", _ => sortBy
-            };
-            var sql = "SELECT * FROM incidents WHERE title ILIKE '%" + (q ?? "")
-                + "%' OR description ILIKE '%" + (q ?? "") + "%' ORDER BY " + order + " LIMIT 50";
-            var rows = await db.Incidents.FromSqlRaw(sql).AsNoTracking().ToListAsync(ct);
-            return Results.Ok(rows.Select(row => new
-            {
-                row.Id, row.Title, row.Description,
-                Severity = row.Severity.ToString(), Status = row.Status.ToString(), row.CreatedAtUtc
-            }));
+                return Results.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    ["sortBy"] = ["Невідоме сортування. Допустимо: createdAtUtc, severity, status."]
+                });
+            }
+
+            var found = await ordered.ThenBy(item => item.Id).Take(SearchLimit).ToListAsync(ct);
+            return Results.Ok(found.Select(item => new IncidentSearchItem(
+                item.Id, item.Title, item.Description, item.Severity.ToString(),
+                item.Status.ToString(), item.CreatedAtUtc)));
         });
         app.MapPost("/api/incidents", async (CreateIncidentRequest request, SecureLabDbContext db, CancellationToken ct) =>
         {
@@ -79,6 +86,38 @@ public static class Lab02Endpoints
         });
     }
 
+    private const int SearchLimit = 50;
+
+    // allowlist сортування: назва з query string лише обирає один із заздалегідь написаних виразів
+    private static IOrderedQueryable<Incident>? ApplySearchOrder(IQueryable<Incident> source, string? sortBy) =>
+        sortBy switch
+        {
+            null or "" or "createdAtUtc" => source.OrderByDescending(item => item.CreatedAtUtc),
+            "severity" => source.OrderBy(item =>
+                item.Severity == IncidentSeverity.Critical ? 1 :
+                item.Severity == IncidentSeverity.High ? 2 :
+                item.Severity == IncidentSeverity.Medium ? 3 : 4),
+            "status" => source.OrderBy(item =>
+                item.Status == IncidentStatus.New ? 1 :
+                item.Status == IncidentStatus.Triaged ? 2 :
+                item.Status == IncidentStatus.InProgress ? 3 :
+                item.Status == IncidentStatus.Resolved ? 4 : 5),
+            _ => null
+        };
+
+    // \ , % і _ мають у LIKE спеціальне значення — екрануємо кожен такий символ
+    private static string EscapeLikePattern(string value)
+    {
+        var builder = new System.Text.StringBuilder(value.Length);
+        foreach (var symbol in value)
+        {
+            if (symbol is '\\' or '%' or '_')
+                builder.Append('\\');
+            builder.Append(symbol);
+        }
+        return builder.ToString();
+    }
+
     private const int MaxTitleLength = 160;
     private const int MaxDescriptionLength = 4000;
     private const int MinDescriptionForHighSeverity = 40;
@@ -119,3 +158,7 @@ public sealed record CreateIncidentRequest(
 public sealed record IncidentCreatedResponse(
     Guid Id, string Title, string Severity, string Status,
     DateTimeOffset OccurredAtUtc, DateTimeOffset CreatedAtUtc);
+
+public sealed record IncidentSearchItem(
+    Guid Id, string Title, string Description, string Severity, string Status,
+    DateTimeOffset CreatedAtUtc);
