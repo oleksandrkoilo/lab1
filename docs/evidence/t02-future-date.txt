@@ -1,0 +1,16 @@
+## T-02. occurredAtUtc у майбутньому
+Тіло запиту:
+{
+  "title": "Подія з майбутнього",
+  "description": "Перевірка верхньої межі часу.",
+  "severity": "Low",
+  "occurredAtUtc": "2099-01-01T00:00:00Z"
+}
+PS lab1-koilo>
+curl.exe -s -i -X POST http://localhost:5080/api/incidents -H 'Content-Type: application/json' --data-binary '@C:\Users\OLEKSA~1\AppData\Local\Temp\lr2k\t02_future.json'
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"type":"https://tools.ietf.org/html/rfc9110#section-15.5.1","title":"One or more validation errors occurred.","status":400,"errors":{"occurredAtUtc":["Поле occurredAtUtc не може випереджати поточний час більш ніж на 5 хвилин."]},"traceId":"00-16cdaf27032046b88b27be302b7e1d9c-720b586fc60a2d56-00"}

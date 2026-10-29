@@ -1,0 +1,34 @@
+## T-09. Critical + опис 39 символів після Trim
+Тіло запиту:
+{
+  "title": "Межа опису Critical 39",
+  "description": "   012345678901234567890123456789012345678   ",
+  "severity": "Critical",
+  "occurredAtUtc": "2026-10-27T15:45:00+02:00"
+}
+PS lab1-koilo>
+curl.exe -s -i -X POST http://localhost:5080/api/incidents -H 'Content-Type: application/json' --data-binary '@C:\Users\OLEKSA~1\AppData\Local\Temp\lr2k\t09_39.json'
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"type":"https://tools.ietf.org/html/rfc9110#section-15.5.1","title":"One or more validation errors occurred.","status":400,"errors":{"description":["Інцидент рівня Critical потребує опису щонайменше з 40 символів."]},"traceId":"00-d69cfc50221ecfb099885c98f143ac9c-5bfcb49a62487341-00"}
+
+## T-09. Critical + опис 40 символів після Trim
+Тіло запиту:
+{
+  "title": "Межа опису Critical 40",
+  "description": "   0123456789012345678901234567890123456789   ",
+  "severity": "Critical",
+  "occurredAtUtc": "2026-10-27T15:45:00+02:00"
+}
+PS lab1-koilo>
+curl.exe -s -i -X POST http://localhost:5080/api/incidents -H 'Content-Type: application/json' --data-binary '@C:\Users\OLEKSA~1\AppData\Local\Temp\lr2k\t09_40.json'
+HTTP/1.1 201 Created
+Content-Type: application/json; charset=utf-8
+Location: /api/incidents/41e38a44-e524-4643-8826-88923a9dadec
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"id":"41e38a44-e524-4643-8826-88923a9dadec","title":"Межа опису Critical 40","severity":"Critical","status":"New","occurredAtUtc":"2026-10-27T13:45:00+00:00","createdAtUtc":"2026-10-29T15:38:09.2488414+00:00"}

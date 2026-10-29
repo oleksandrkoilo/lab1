@@ -1,0 +1,16 @@
+## T-02. severity = "7"
+Тіло запиту:
+{
+  "title": "Неіснуючий рівень серйозності",
+  "description": "Перевірка числового значення severity.",
+  "severity": "7",
+  "occurredAtUtc": "2026-10-27T15:45:00+02:00"
+}
+PS lab1-koilo>
+curl.exe -s -i -X POST http://localhost:5080/api/incidents -H 'Content-Type: application/json' --data-binary '@C:\Users\OLEKSA~1\AppData\Local\Temp\lr2k\t02_sev7.json'
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"type":"https://tools.ietf.org/html/rfc9110#section-15.5.1","title":"One or more validation errors occurred.","status":400,"errors":{"severity":["Поле severity приймає лише Low, Medium, High або Critical."]},"traceId":"00-235a949eada226b5dce3f2a236c22e66-d5e167e7eb7f482e-00"}

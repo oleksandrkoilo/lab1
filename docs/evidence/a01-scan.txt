@@ -1,0 +1,88 @@
+## A-01. Пошук raw SQL у src і tests
+PS lab1-koilo>
+py -3 "<ЛР2>\lab-02-scaffold\resources\copyable\data-access-scan.py" .
+src\SecureLab.Api\Data\DatabaseBootstrap.cs:29:await dbContext.Database.ExecuteSqlRawAsync(
+PS lab1-koilo>
+git --no-pager grep -n -E "FromSqlRaw|ExecuteSqlRaw|ORDER BY|SELECT " -- src tests
+src/SecureLab.Api/Data/DatabaseBootstrap.cs:29:            await dbContext.Database.ExecuteSqlRawAsync(
+PS lab1-koilo>
+dotnet run --project src/SecureLab.Api -- --reset-database
+Using launch settings from src\SecureLab.Api\Properties\launchSettings.json...
+Building...
+Відновлення початкових локальних навчальних даних...
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (16ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "MigrationId", "ProductVersion"
+      FROM "__EFMigrationsHistory"
+      ORDER BY "MigrationId";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
+          "MigrationId" character varying(150) NOT NULL,
+          "ProductVersion" character varying(32) NOT NULL,
+          CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY ("MigrationId")
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      LOCK TABLE "__EFMigrationsHistory" IN ACCESS EXCLUSIVE MODE
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "MigrationId", "ProductVersion"
+      FROM "__EFMigrationsHistory"
+      ORDER BY "MigrationId";
+info: Microsoft.EntityFrameworkCore.Migrations[20405]
+      No migrations were applied. The database is already up to date.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (15ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      TRUNCATE TABLE incident_comments, incident_status_history, incidents, study_users RESTART IDENTITY CASCADE;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM study_users AS s)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (14ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?', @p2='?', @p3='?', @p4='?', @p5='?' (DbType = Guid), @p6='?', @p7='?', @p8='?', @p9='?', @p10='?' (DbType = Guid), @p11='?', @p12='?', @p13='?', @p14='?', @p15='?' (DbType = Guid), @p16='?', @p17='?', @p18='?', @p19='?', @p20='?' (DbType = Guid), @p21='?' (DbType = DateTime), @p22='?', @p23='?' (DbType = DateTime), @p24='?' (DbType = Guid), @p25='?', @p26='?', @p27='?', @p28='?' (DbType = DateTime), @p29='?' (DbType = Guid), @p30='?' (DbType = DateTime), @p31='?', @p32='?' (DbType = DateTime), @p33='?' (DbType = Guid), @p34='?', @p35='?', @p36='?', @p37='?' (DbType = DateTime), @p38='?' (DbType = Guid), @p39='?' (DbType = DateTime), @p40='?', @p41='?' (DbType = DateTime), @p42='?' (DbType = Guid), @p43='?', @p44='?', @p45='?', @p46='?' (DbType = DateTime), @p47='?' (DbType = Guid), @p48='?' (DbType = Guid), @p49='?' (DbType = DateTime), @p50='?' (DbType = Guid), @p51='?' (DbType = Boolean), @p52='?', @p53='?' (DbType = Guid), @p54='?' (DbType = Guid), @p55='?' (DbType = DateTime), @p56='?' (DbType = Guid), @p57='?' (DbType = Boolean), @p58='?', @p59='?' (DbType = Guid), @p60='?' (DbType = Guid), @p61='?' (DbType = DateTime), @p62='?' (DbType = Guid), @p63='?', @p64='?', @p65='?'], CommandType='Text', CommandTimeout='30']
+      INSERT INTO study_users (id, display_name, email, role, user_name)
+      VALUES (@p0, @p1, @p2, @p3, @p4);
+      INSERT INTO study_users (id, display_name, email, role, user_name)
+      VALUES (@p5, @p6, @p7, @p8, @p9);
+      INSERT INTO study_users (id, display_name, email, role, user_name)
+      VALUES (@p10, @p11, @p12, @p13, @p14);
+      INSERT INTO study_users (id, display_name, email, role, user_name)
+      VALUES (@p15, @p16, @p17, @p18, @p19);
+      INSERT INTO incidents (id, created_at_utc, description, occurred_at_utc, owner_user_id, severity, status, title, updated_at_utc)
+      VALUES (@p20, @p21, @p22, @p23, @p24, @p25, @p26, @p27, @p28);
+      INSERT INTO incidents (id, created_at_utc, description, occurred_at_utc, owner_user_id, severity, status, title, updated_at_utc)
+      VALUES (@p29, @p30, @p31, @p32, @p33, @p34, @p35, @p36, @p37);
+      INSERT INTO incidents (id, created_at_utc, description, occurred_at_utc, owner_user_id, severity, status, title, updated_at_utc)
+      VALUES (@p38, @p39, @p40, @p41, @p42, @p43, @p44, @p45, @p46);
+      INSERT INTO incident_comments (id, author_user_id, created_at_utc, incident_id, is_internal, text)
+      VALUES (@p47, @p48, @p49, @p50, @p51, @p52);
+      INSERT INTO incident_comments (id, author_user_id, created_at_utc, incident_id, is_internal, text)
+      VALUES (@p53, @p54, @p55, @p56, @p57, @p58);
+      INSERT INTO incident_status_history (id, changed_by_user_id, created_at_utc, incident_id, new_status, note, old_status)
+      VALUES (@p59, @p60, @p61, @p62, @p63, @p64, @p65);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@id='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM incidents AS i
+          WHERE i.id = @id)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@id='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM incidents AS i
+          WHERE i.id = @id)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (DbType = DateTime), @p2='?', @p3='?' (DbType = DateTime), @p4='?' (DbType = Guid), @p5='?', @p6='?', @p7='?', @p8='?' (DbType = DateTime), @p9='?' (DbType = Guid), @p10='?' (DbType = DateTime), @p11='?', @p12='?' (DbType = DateTime), @p13='?' (DbType = Guid), @p14='?', @p15='?', @p16='?', @p17='?' (DbType = DateTime)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO incidents (id, created_at_utc, description, occurred_at_utc, owner_user_id, severity, status, title, updated_at_utc)
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8);
+      INSERT INTO incidents (id, created_at_utc, description, occurred_at_utc, owner_user_id, severity, status, title, updated_at_utc)
+      VALUES (@p9, @p10, @p11, @p12, @p13, @p14, @p15, @p16, @p17);
+Локальні навчальні дані очищено та повторно заповнено seed-значеннями.
+API запускається (лог: logs\api-stageB.out.log)...
+PS>TerminatingError(Invoke-WebRequest): "The operation has timed out."

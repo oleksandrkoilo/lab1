@@ -1,0 +1,14 @@
+## T-02. Відсутні обов'язкові поля
+Тіло запиту:
+{
+  "description": "   ",
+  "severity": "Severe"
+}
+PS lab1-koilo>
+curl.exe -s -i -X POST http://localhost:5080/api/incidents -H 'Content-Type: application/json' --data-binary '@C:\Users\OLEKSA~1\AppData\Local\Temp\lr2k\t02_missing.json'
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"type":"https://tools.ietf.org/html/rfc9110#section-15.5.1","title":"One or more validation errors occurred.","status":400,"errors":{"title":["Поле title є обов'язковим."],"description":["Поле description є обов'язковим."],"severity":["Поле severity приймає лише Low, Medium, High або Critical."],"occurredAtUtc":["Поле occurredAtUtc є обов'язковим."]},"traceId":"00-8b6d4f5ecf1dd38c592eab1a0d0aee2c-b057a50479bf3dc0-00"}

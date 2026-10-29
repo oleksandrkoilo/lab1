@@ -1,0 +1,4 @@
+## dotnet test tests/SecureLab.Api.Tests -c Release (fixed commit)
+dotnet test tests/SecureLab.Api.Tests -c Release
+  SecureLab.Api.Tests -> lab1-koilo\tests\SecureLab.Api.Tests\bin\Release\net10.0\SecureLab.Api.Tests.dll
+Passed!  - Failed:     0, Passed:     8, Skipped:     0, Total:     8, Duration: 2 s - SecureLab.Api.Tests.dll (net10.0)

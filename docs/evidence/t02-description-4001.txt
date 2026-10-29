@@ -1,0 +1,16 @@
+## T-02. description довший за 4000 символів
+Тіло запиту:
+{
+  "title": "Задовгий опис",
+  "description": "аааа…а (4001 символ)",
+  "severity": "Low",
+  "occurredAtUtc": "2026-10-27T15:45:00+02:00"
+}
+PS lab1-koilo>
+curl.exe -s -i -X POST http://localhost:5080/api/incidents -H 'Content-Type: application/json' --data-binary '@C:\Users\OLEKSA~1\AppData\Local\Temp\lr2k\t02_desc4001.json'
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"type":"https://tools.ietf.org/html/rfc9110#section-15.5.1","title":"One or more validation errors occurred.","status":400,"errors":{"description":["Поле description має містити не більше 4000 символів."]},"traceId":"00-d2959fe98458f7dc53ccbd16692d25bb-9f85ef4be17a70f4-00"}

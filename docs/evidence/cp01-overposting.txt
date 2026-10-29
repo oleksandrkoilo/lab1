@@ -1,0 +1,31 @@
+## CP-01. Overposting: id, status, ownerUserId, createdAtUtc
+Тіло запиту:
+{
+  "title": "Спроба overposting",
+  "description": "Клієнт намагається сам задати службові поля.",
+  "severity": "Low",
+  "occurredAtUtc": "2026-10-27T15:45:00+02:00",
+  "id": "22222222-2222-2222-2222-222222222222",
+  "status": "Resolved",
+  "ownerUserId": "10000000-0000-0000-0000-000000000002",
+  "createdAtUtc": "2001-01-01T00:00:00Z"
+}
+PS lab1-koilo>
+curl.exe -s -i -X POST http://localhost:5080/api/incidents -H 'Content-Type: application/json' --data-binary '@C:\Users\OLEKSA~1\AppData\Local\Temp\lr2k\cp01_over.json'
+HTTP/1.1 201 Created
+Content-Type: application/json; charset=utf-8
+Location: /api/incidents/1e39c2bb-f885-40f5-818a-f54e6c5f833c
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"id":"1e39c2bb-f885-40f5-818a-f54e6c5f833c","title":"Спроба overposting","severity":"Low","status":"New","occurredAtUtc":"2026-10-27T13:45:00+00:00","createdAtUtc":"2026-10-29T15:38:13.1358436+00:00"}
+
+## CP-01. Перевірка створеного запису за адресою з Location
+PS lab1-koilo>
+curl.exe -s -i "http://localhost:5080/api/incidents/1e39c2bb-f885-40f5-818a-f54e6c5f833c"
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"id":"1e39c2bb-f885-40f5-818a-f54e6c5f833c","title":"Спроба overposting","description":"Клієнт намагається сам задати службові поля.","severity":"Low","status":"New","occurredAtUtc":"2026-10-27T13:45:00+00:00","createdAtUtc":"2026-10-29T15:38:13.135843+00:00","ownerDisplayName":"Аліса Коваль","comments":[]}

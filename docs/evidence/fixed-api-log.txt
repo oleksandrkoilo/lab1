@@ -1,0 +1,9 @@
+## Журнал API після виправлення
+Executed DbCommand (2ms) [Parameters=[@likePattern='?', @likePattern0='?', @p='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+Executed DbCommand (3ms) [Parameters=[@likePattern='?', @likePattern0='?', @p='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+Executed DbCommand (2ms) [Parameters=[@likePattern='?', @likePattern0='?', @p='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+Executed DbCommand (2ms) [Parameters=[@likePattern='?', @likePattern0='?', @p='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+Executed DbCommand (2ms) [Parameters=[@likePattern='?', @likePattern0='?', @p='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+Executed DbCommand (2ms) [Parameters=[@likePattern='?', @likePattern0='?', @p='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+Executed DbCommand (2ms) [Parameters=[@likePattern='?', @likePattern0='?', @p='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+Executed DbCommand (3ms) [Parameters=[@likePattern='?', @likePattern0='?', @p='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']

@@ -1,0 +1,51 @@
+## T-03. Повтор назви активного інциденту (Triaged)
+Тіло запиту:
+{
+  "title": "Підозрілий лист із вкладенням",
+  "description": "Ще одне повідомлення про той самий лист.",
+  "severity": "Medium",
+  "occurredAtUtc": "2026-10-27T15:45:00+02:00"
+}
+PS lab1-koilo>
+curl.exe -s -i -X POST http://localhost:5080/api/incidents -H 'Content-Type: application/json' --data-binary '@C:\Users\OLEKSA~1\AppData\Local\Temp\lr2k\t03_dup.json'
+HTTP/1.1 409 Conflict
+Content-Type: application/problem+json
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"type":"https://tools.ietf.org/html/rfc9110#section-15.5.10","title":"Конфлікт назви інциденту","status":409,"detail":"Незакритий інцидент із такою назвою вже існує. Оберіть іншу назву.","traceId":"00-1d6691fd15885710c5721e4c952b4ab3-8ddf34bfa5f48720-00"}
+
+## T-03. Та сама назва з пробілами
+Тіло запиту:
+{
+  "title": "  Підозрілий лист із вкладенням  ",
+  "description": "Повідомлення з пробілами навколо назви.",
+  "severity": "Medium",
+  "occurredAtUtc": "2026-10-27T15:45:00+02:00"
+}
+PS lab1-koilo>
+curl.exe -s -i -X POST http://localhost:5080/api/incidents -H 'Content-Type: application/json' --data-binary '@C:\Users\OLEKSA~1\AppData\Local\Temp\lr2k\t03_trim.json'
+HTTP/1.1 409 Conflict
+Content-Type: application/problem+json
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"type":"https://tools.ietf.org/html/rfc9110#section-15.5.10","title":"Конфлікт назви інциденту","status":409,"detail":"Незакритий інцидент із такою назвою вже існує. Оберіть іншу назву.","traceId":"00-7c2694943359e4c7d5e07977514edec3-4c371a1d23d69f79-00"}
+
+## T-03. Та сама назва великими літерами
+Тіло запиту:
+{
+  "title": "ПІДОЗРІЛИЙ ЛИСТ ІЗ ВКЛАДЕННЯМ",
+  "description": "Назва відрізняється лише регістром.",
+  "severity": "Medium",
+  "occurredAtUtc": "2026-10-27T15:45:00+02:00"
+}
+PS lab1-koilo>
+curl.exe -s -i -X POST http://localhost:5080/api/incidents -H 'Content-Type: application/json' --data-binary '@C:\Users\OLEKSA~1\AppData\Local\Temp\lr2k\t03_case.json'
+HTTP/1.1 201 Created
+Content-Type: application/json; charset=utf-8
+Location: /api/incidents/6ad12c4a-ca9a-4029-acde-8da1b62dabfb
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"id":"6ad12c4a-ca9a-4029-acde-8da1b62dabfb","title":"ПІДОЗРІЛИЙ ЛИСТ ІЗ ВКЛАДЕННЯМ","severity":"Medium","status":"New","occurredAtUtc":"2026-10-27T13:45:00+00:00","createdAtUtc":"2026-10-29T15:38:12.1474162+00:00"}

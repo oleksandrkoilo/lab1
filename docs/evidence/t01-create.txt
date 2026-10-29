@@ -1,0 +1,17 @@
+## T-01. Коректне створення інциденту
+Тіло запиту:
+{
+  "title": "Фішинговий лист від імені бібліотеки",
+  "description": "Кілька студентів отримали лист із посиланням на підроблену сторінку входу.",
+  "severity": "Medium",
+  "occurredAtUtc": "2026-10-27T15:45:00+02:00"
+}
+PS lab1-koilo>
+curl.exe -s -i -X POST http://localhost:5080/api/incidents -H 'Content-Type: application/json' --data-binary '@C:\Users\OLEKSA~1\AppData\Local\Temp\lr2k\t01_valid.json'
+HTTP/1.1 201 Created
+Content-Type: application/json; charset=utf-8
+Location: /api/incidents/1dccfb12-781f-4bf3-9270-465e1247b132
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"id":"1dccfb12-781f-4bf3-9270-465e1247b132","title":"Фішинговий лист від імені бібліотеки","severity":"Medium","status":"New","occurredAtUtc":"2026-10-27T13:45:00+00:00","createdAtUtc":"2026-10-29T15:38:03.3323704+00:00"}
