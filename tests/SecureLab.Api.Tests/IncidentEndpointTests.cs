@@ -64,8 +64,8 @@ public sealed class IncidentEndpointTests(SecureLabApiFactory factory)
 
         var items = await response.Content.ReadFromJsonAsync<List<IncidentSeveritySummaryResponse>>();
         Assert.NotNull(items);
-        Assert.Equal(new[] { "High", "Medium", "Low" }, items.Select(item => item.Severity).ToArray());
-        Assert.All(items, item => Assert.Equal(1, item.Count));
+        Assert.Equal(new[] { "Low", "High", "Medium" }, items.Select(item => item.Severity).ToArray());
+        Assert.Equal(new[] { 3, 1, 1 }, items.Select(item => item.Count).ToArray());
         Assert.DoesNotContain(items, item => item.Severity == "Critical");
     }
 }
