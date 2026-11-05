@@ -1,0 +1,17 @@
+## dotnet test tests/SecureLab.Api.Tests -c Release (після змін)
+dotnet test tests/SecureLab.Api.Tests -c Release --logger "console;verbosity=normal"
+  Passed SecureLab.Api.Tests.IncidentEndpointTests.GetList_ReturnsSeededIncidents [1 s]
+  Passed SecureLab.Api.Tests.IncidentEndpointTests.ClientScript_DoesNotUseDangerousInnerHtmlSink [12 ms]
+  Passed SecureLab.Api.Tests.IncidentEndpointTests.SeveritySummary_ReturnsOnlyExistingGroups_OrderedByCountThenSeverity [50 ms]
+  Passed SecureLab.Api.Tests.IncidentEndpointTests.GetDetails_DoesNotExposeInternalOwnerFields [59 ms]
+  Passed SecureLab.Api.Tests.IncidentEndpointTests.GetDetails_ForUnknownId_ReturnsProblemDetails404 [35 ms]
+  Passed SecureLab.Api.Tests.AuthenticationMechanicsTests.RealCookie_ReachesSessionCheck [263 ms]
+  Passed SecureLab.Api.Tests.Lab03SecurityTests.A05_ForgedOwnerInBody_IsIgnored_OwnerComesFromPrincipal [338 ms]
+  Passed SecureLab.Api.Tests.Lab03SecurityTests.A02_ProfileAfterLogin_DescribesAuthenticatedUser [82 ms]
+  Passed SecureLab.Api.Tests.Lab03SecurityTests.A01_CreateIncidentWithoutCookie_IsRejectedWith401 [8 ms]
+  Passed SecureLab.Api.Tests.SearchMechanicsTests.Search_ReturnsJson [114 ms]
+  Passed SecureLab.Api.Tests.Lab02ValidationTests.T03_SecondActiveIncidentWithSameTitle_Returns409 [210 ms]
+  Passed SecureLab.Api.Tests.Lab02ValidationTests.T02_SeverityOutsideEnum_IsRejectedWithProblemDetails [83 ms]
+Test Run Successful.
+Total tests: 12
+     Passed: 12

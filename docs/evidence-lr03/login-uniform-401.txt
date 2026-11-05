@@ -1,0 +1,20 @@
+## CP-02: однакова відмова login - хибний пароль і невідомий користувач
+PS lab1-koilo>
+curl.exe -s -i -X POST http://localhost:5080/api/auth/login (cookie jar) --data-binary @-
+тіло: {"userName":"alice","password":"*** (хибний пароль)"}
+HTTP/1.1 401 Unauthorized
+Content-Type: application/problem+json
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"type":"https://tools.ietf.org/html/rfc9110#section-15.5.2","title":"Unauthorized","status":401,"traceId":"00-59393464c10a239f87d84ca8ab88e35c-f99ddf5cb4abe72c-00"}
+
+PS lab1-koilo>
+curl.exe -s -i -X POST http://localhost:5080/api/auth/login (cookie jar) --data-binary @-
+тіло: {"userName":"nobody-9add7c","password":"*** (невідомий користувач)"}
+HTTP/1.1 401 Unauthorized
+Content-Type: application/problem+json
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"type":"https://tools.ietf.org/html/rfc9110#section-15.5.2","title":"Unauthorized","status":401,"traceId":"00-8bf9e7db3fdfac8c4b49e3607c4a2bf6-17e4db04ccd8b4ec-00"}

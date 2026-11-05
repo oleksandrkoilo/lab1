@@ -1,0 +1,21 @@
+## T-02: той самий запит удруге (дублікат)
+PS lab1-koilo>
+curl.exe -s -i -X POST http://localhost:5080/api/auth/register --data-binary @-
+тіло: {"userName":"studentbea07f71","email":"studentbea07f71@example.test","displayName":"Студент 02","password":"***"}
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"type":"https://tools.ietf.org/html/rfc9110#section-15.5.1","title":"Реєстрацію не виконано","status":400,"detail":"Перевірте дані та спробуйте ще раз.","traceId":"00-67b446cd1c2533d0c662d2b31cd67459-fc1fdd754e5a8ab4-00"}
+
+## T-02: некоректні поля (email без @, displayName 121 символ)
+PS lab1-koilo>
+curl.exe -s -i -X POST http://localhost:5080/api/auth/register --data-binary @-
+тіло: {"userName":"koilo test#","email":"koilo.example.test","displayName":"Я x121","password":"***"}
+HTTP/1.1 400 Bad Request
+Content-Type: application/problem+json
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"type":"https://tools.ietf.org/html/rfc9110#section-15.5.1","title":"One or more validation errors occurred.","status":400,"errors":{"userName":["Поле userName допускає лише латинські літери, цифри та - . _ @ +"],"email":["Поле email має некоректний формат."],"displayName":["Поле displayName має містити не більше 120 символів."]},"traceId":"00-113bd376c4ecb722a57c99f778d06adc-d0ea5e0863cc9ec4-00"}

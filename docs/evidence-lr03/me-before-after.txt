@@ -1,0 +1,57 @@
+## До змін: GET /api/me без входу (заглушка)
+PS lab1-koilo>
+curl.exe -s -i -X GET http://localhost:5080/api/me
+HTTP/1.1 501 Not Implemented
+Content-Type: application/problem+json
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"type":"https://tools.ietf.org/html/rfc9110#section-15.6.2","title":"Not Implemented","status":501,"traceId":"00-2f43fd771ecac783d50589cba59e49bc-0286961fed3013cd-00"}
+
+## До змін: GET /api/me з X-Demo-UserId Bob і без cookie (дефект довіри)
+PS lab1-koilo>
+curl.exe -s -i -X GET http://localhost:5080/api/me -H "X-Demo-UserId: 10000000-0000-0000-0000-000000000002"
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"id":"10000000-0000-0000-0000-000000000002","userName":"bob","displayName":"Боб Мельник"}
+
+## Після змін (A-01): GET /api/me без входу
+PS lab1-koilo>
+curl.exe -s -i -X GET http://localhost:5080/api/me
+HTTP/1.1 401 Unauthorized
+Content-Type: application/problem+json
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"type":"https://tools.ietf.org/html/rfc9110#section-15.5.2","title":"Unauthorized","status":401,"traceId":"00-4fb0dc5205f556a9c6f22e21212fed7b-64c70021d65af175-00"}
+
+## Після змін: GET /api/me з X-Demo-UserId Bob і без cookie
+PS lab1-koilo>
+curl.exe -s -i -X GET http://localhost:5080/api/me -H "X-Demo-UserId: 10000000-0000-0000-0000-000000000002"
+HTTP/1.1 401 Unauthorized
+Content-Type: application/problem+json
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"type":"https://tools.ietf.org/html/rfc9110#section-15.5.2","title":"Unauthorized","status":401,"traceId":"00-45c4fb7247fc14605b2419debaee05bd-3e050b9a64ba4bc3-00"}
+
+## Після змін (A-02, CP-02): login alice -> GET /api/me
+PS lab1-koilo>
+curl.exe -s -i -X POST http://localhost:5080/api/auth/login (cookie jar) --data-binary @-
+тіло: {"userName":"alice","password":"***"}
+HTTP/1.1 204 No Content
+Set-Cookie: .AspNetCore.Identity.Application=<значення приховано>
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+PS lab1-koilo>
+curl.exe -s -i -X GET http://localhost:5080/api/me (cookie jar)
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"userId":"10000000-0000-0000-0000-000000000001","userName":"alice","displayName":"Аліса Коваль","roles":["Reporter"]}

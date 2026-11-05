@@ -1,0 +1,52 @@
+## До змін: анонімний POST /api/incidents (операція не захищена)
+PS lab1-koilo>
+curl.exe -s -i -X POST http://localhost:5080/api/incidents --data-binary @-
+тіло: {"title":"Анонімний запис до ЛР3","description":"Створення інциденту без автентифікації.","occurredAtUtc":"2026-11-03T18:30:00+02:00","severity":"Low"}
+HTTP/1.1 201 Created
+Content-Type: application/json; charset=utf-8
+Location: /api/incidents/f67a42ef-113d-4f25-a060-35805695bd61
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"id":"f67a42ef-113d-4f25-a060-35805695bd61","title":"Анонімний запис до ЛР3","severity":"Low","status":"New","occurredAtUtc":"2026-11-03T16:30:00+00:00","createdAtUtc":"2026-11-05T15:28:04.164308+00:00"}
+
+## CP-03 (A-01): анонімний POST /api/incidents
+PS lab1-koilo>
+curl.exe -s -i -X POST http://localhost:5080/api/incidents --data-binary @-
+тіло: {"title":"Анонімний запис після ЛР3","description":"Створення інциденту без автентифікації.","occurredAtUtc":"2026-11-03T18:30:00+02:00","severity":"Low"}
+HTTP/1.1 401 Unauthorized
+Content-Type: application/problem+json
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"type":"https://tools.ietf.org/html/rfc9110#section-15.5.2","title":"Unauthorized","status":401,"traceId":"00-fa5dd9c6bcc6452043c2df4338428a50-120d182776cf724b-00"}
+
+## CP-03 (A-05): Bob створює інцидент і підставляє ownerUserId Alice
+PS lab1-koilo>
+curl.exe -s -i -X POST http://localhost:5080/api/auth/login (cookie jar) --data-binary @-
+тіло: {"userName":"bob","password":"***"}
+HTTP/1.1 204 No Content
+Set-Cookie: .AspNetCore.Identity.Application=<значення приховано>
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+PS lab1-koilo>
+curl.exe -s -i -X POST http://localhost:5080/api/incidents (cookie jar) --data-binary @-
+тіло: {"title":"Підміна власника від імені Bob","description":"У тілі запиту передано ownerUserId Alice.","ownerUserId":"10000000-0000-0000-0000-000000000001","occurredAtUtc":"2026-11-03T18:30:00+02:00","severity":"Low"}
+HTTP/1.1 201 Created
+Content-Type: application/json; charset=utf-8
+Location: /api/incidents/a86b6b64-2a22-4953-9184-3ee2b4970b0d
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"id":"a86b6b64-2a22-4953-9184-3ee2b4970b0d","title":"Підміна власника від імені Bob","severity":"Low","status":"New","occurredAtUtc":"2026-11-03T16:30:00+00:00","createdAtUtc":"2026-11-05T15:28:37.9122257+00:00"}
+
+## CP-03: створений запис - власник за даними сервера
+PS lab1-koilo>
+curl.exe -s -i -X GET http://localhost:5080/api/incidents/a86b6b64-2a22-4953-9184-3ee2b4970b0d (cookie jar)
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+
+{"id":"a86b6b64-2a22-4953-9184-3ee2b4970b0d","title":"Підміна власника від імені Bob","description":"У тілі запиту передано ownerUserId Alice.","severity":"Low","status":"New","occurredAtUtc":"2026-11-03T16:30:00+00:00","createdAtUtc":"2026-11-05T15:28:37.912225+00:00","ownerDisplayName":"Боб Мельник","comments":[]}
