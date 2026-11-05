@@ -11,7 +11,10 @@ namespace SecureLab.Api.Tests;
 public sealed class Lab02ValidationTests(SecureLabApiFactory factory)
     : IClassFixture<SecureLabApiFactory>
 {
-    private readonly HttpClient _client = factory.CreateClient();
+    // ЛР 03: створення інциденту вимагає входу, тому перевірки контракту виконуються від імені Alice
+    private static string SeedPassword =>
+        Environment.GetEnvironmentVariable("SeedUsers__Password")
+        ?? throw new InvalidOperationException("Set local SeedUsers__Password outside Git.");
 
     [Fact]
     public async Task T02_SeverityOutsideEnum_IsRejectedWithProblemDetails()
@@ -24,7 +27,8 @@ public sealed class Lab02ValidationTests(SecureLabApiFactory factory)
             occurredAtUtc = DateTimeOffset.UtcNow.AddMinutes(-30)
         };
 
-        using var response = await _client.PostAsJsonAsync("/api/incidents", payload);
+        using var client = await factory.LoginAsync("alice", SeedPassword);
+        using var response = await client.PostAsJsonAsync("/api/incidents", payload);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
@@ -45,12 +49,13 @@ public sealed class Lab02ValidationTests(SecureLabApiFactory factory)
             occurredAtUtc = DateTimeOffset.UtcNow.AddMinutes(-30)
         };
 
+        using var client = await factory.LoginAsync("alice", SeedPassword);
         try
         {
-            using var created = await _client.PostAsJsonAsync("/api/incidents", payload);
+            using var created = await client.PostAsJsonAsync("/api/incidents", payload);
             Assert.Equal(HttpStatusCode.Created, created.StatusCode);
 
-            using var duplicate = await _client.PostAsJsonAsync("/api/incidents", payload);
+            using var duplicate = await client.PostAsJsonAsync("/api/incidents", payload);
             Assert.Equal(HttpStatusCode.Conflict, duplicate.StatusCode);
             Assert.Equal("application/problem+json", duplicate.Content.Headers.ContentType?.MediaType);
         }

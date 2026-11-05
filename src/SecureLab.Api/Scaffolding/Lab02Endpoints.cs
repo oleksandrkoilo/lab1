@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using SecureLab.Api.Data;
 using SecureLab.Api.Data.Entities;
@@ -32,7 +33,7 @@ public static class Lab02Endpoints
                 item.Id, item.Title, item.Description, item.Severity.ToString(),
                 item.Status.ToString(), item.CreatedAtUtc)));
         });
-        app.MapPost("/api/incidents", async (CreateIncidentRequest request, SecureLabDbContext db, CancellationToken ct) =>
+        app.MapPost("/api/incidents", async (CreateIncidentRequest request, ClaimsPrincipal user, SecureLabDbContext db, CancellationToken ct) =>
         {
             // ЛР 02: власні перевірки контракту 2-A до створення entity та звернення до БД
             var now = DateTimeOffset.UtcNow;
@@ -65,10 +66,14 @@ public static class Lab02Endpoints
                     detail: "Незакритий інцидент із такою назвою вже існує. Оберіть іншу назву.");
             }
 
+            // ЛР 03: ідентифікатор власника береться з перевіреного principal, а не з тіла запиту
+            if (!TryGetUserId(user, out var ownerUserId))
+                return Results.Problem(statusCode: StatusCodes.Status500InternalServerError);
+
             var incident = new Incident
             {
                 Id = Guid.NewGuid(),
-                OwnerUserId = DbSeeder.AliceId,
+                OwnerUserId = ownerUserId, // ЛР 03: власник — автентифікований користувач
                 Title = title,
                 Description = description,
                 Severity = severity,
@@ -83,8 +88,11 @@ public static class Lab02Endpoints
             return Results.Created($"/api/incidents/{incident.Id}", new IncidentCreatedResponse(
                 incident.Id, incident.Title, incident.Severity.ToString(), incident.Status.ToString(),
                 incident.OccurredAtUtc, incident.CreatedAtUtc));
-        });
+        }).RequireAuthorization(); // ЛР 03: створення доступне лише після входу
     }
+
+    private static bool TryGetUserId(ClaimsPrincipal user, out Guid userId) =>
+        Guid.TryParse(user.FindFirstValue(ClaimTypes.NameIdentifier), out userId);
 
     private const int SearchLimit = 50;
 
